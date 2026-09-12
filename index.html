@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080a14" />
+    <meta name="description" content="选择一只猫，成为它的秘密竞选幕僚。六个回合，一座随时失控的城市。" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23080a14'/%3E%3Cpath d='M17 23 10 12l15 6a25 25 0 0 1 14 0l15-6-7 11c4 5 6 10 5 16-1 9-9 15-20 15S13 48 12 39c-1-6 1-11 5-16Z' fill='%23ffcf4a'/%3E%3Ccircle cx='25' cy='34' r='3' fill='%23080a14'/%3E%3Ccircle cx='40' cy='34' r='3' fill='%23080a14'/%3E%3Cpath d='M29 42h7' stroke='%23080a14' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <title>猫猫市政厅：幕后喵手</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="noise" aria-hidden="true"></div>
+
+    <section class="selection-screen" id="selectionScreen" aria-labelledby="selectionTitle">
+      <div class="selection-top">
+        <a class="brand" href="#" aria-label="猫猫市政厅首页"><span class="brand-mark">CAT</span><span>猫猫市政厅</span></a>
+        <span class="season">幕后喵手 · AGENT 赛季 02</span>
+      </div>
+      <div class="selection-copy">
+        <p class="eyebrow">CHOOSE YOUR CANDIDATE</p>
+        <h1 id="selectionTitle">选一只猫，<br />替它赢下这座城。</h1>
+        <p>五只猫由五种独立人格驱动。你可以出谋划策，但它们会按照自己的欲望临场发挥。</p>
+      </div>
+      <div class="selection-grid" id="selectionGrid" aria-label="选择你的候选猫"></div>
+      <p class="selection-hint">点击猫咪查看秘密任务</p>
+    </section>
+
+    <dialog class="briefing-dialog" id="briefingDialog">
+      <button class="dialog-close" id="closeBriefing" type="button" aria-label="关闭">×</button>
+      <p class="eyebrow">TOP SECRET</p>
+      <div class="briefing-cat" id="briefingCat"></div>
+      <p class="briefing-role" id="briefingRole"></p>
+      <h2 id="briefingTitle"></h2>
+      <div class="secret-mission"><span>秘密任务</span><p id="briefingSecret"></p></div>
+      <div class="agent-brief"><span>专属机制</span><b id="briefingMechanic"></b><p id="briefingPersona"></p></div>
+      <p class="briefing-tip" id="briefingTip"></p>
+      <button class="primary-button" id="confirmCandidate" type="button">就选它，进入城市</button>
+    </dialog>
+
+    <div class="game-app" id="gameApp" hidden>
+      <header class="topbar">
+        <a class="brand" href="#" id="backHome" aria-label="重新选猫"><span class="brand-mark">CAT</span><span>猫猫市政厅</span></a>
+        <div class="round-track" aria-label="游戏回合"><span id="roundLabel">回合 1 / 6</span><div class="round-pips" id="roundPips"></div></div>
+        <div class="topbar-actions"><div class="agent-network" title="五只猫拥有各自的 Codex 线程、人格和私有记忆"><i></i><span id="agentModeLabel">Codex 五猫 Agent 待命</span></div><button class="sound-button" id="soundToggle" type="button" aria-pressed="false">音效：关</button></div>
+      </header>
+
+      <main class="game-layout">
+        <section class="board-column">
+          <div class="event-banner" id="eventBanner" aria-live="polite">
+            <div class="event-icon" id="eventIcon">📡</div>
+            <div><p class="eyebrow">本回合突发事件</p><h2 id="eventTitle">市长候选猫即将入场</h2><p id="eventDescription">猫猫市的每个角落都在等待你的决定。</p><div class="event-impact" id="eventImpact">本回合规则将在这里显示</div></div>
+            <span class="chaos-meter">混乱 <b id="chaosValue">12</b></span>
+          </div>
+
+          <section class="headline-strip" aria-labelledby="headlineTitle">
+            <div class="headline-label"><span>猫猫市晚报</span><b id="headlineTitle">实时头条</b></div>
+            <div class="headline-ticker" id="headlineTicker"><span>竞选季开始，全城罐头价格小幅上涨。</span><b>晚报风向会让对应行动获得支持加成</b></div>
+          </section>
+
+          <section class="action-dock" id="actionDock" aria-labelledby="actionTitle">
+            <div class="dock-heading">
+              <div><p class="eyebrow" id="actionStep">第一步 · 选择地点</p><h2 id="actionTitle">派你的候选猫去哪里？</h2></div>
+              <button class="ghost-button" id="undoLocation" type="button" hidden>重选地点</button>
+            </div>
+            <div class="action-options" id="actionOptions"><p class="dock-tip">点击地图上的地点。其他猫会同时秘密行动。</p></div>
+          </section>
+
+          <section class="city-map" id="cityMap" aria-label="猫猫市地图">
+            <div class="map-grid" id="mapGrid"></div>
+            <div class="city-seal" aria-hidden="true"><span>猫</span><small>CITY 0520</small></div>
+          </section>
+
+        </section>
+
+        <aside class="intel-panel">
+          <section class="player-card" id="playerCard"></section>
+          <section class="resources" aria-label="你的资源">
+            <div><span>支持度</span><strong id="supportValue">0</strong></div>
+            <div><span>🥫 罐头</span><strong id="canValue">0</strong></div>
+            <div><span>🔎 线索</span><strong id="clueValue">0</strong></div>
+          </section>
+          <section class="mission-panel">
+            <p class="eyebrow">SECRET MISSION</p><h2>秘密任务</h2><p id="missionText"></p>
+            <div class="mission-progress"><span id="missionProgress"></span></div><small id="missionStatus">尚未完成</small>
+          </section>
+          <section class="ability-panel" id="abilityPanel">
+            <div class="panel-heading"><h2 id="abilityName">专属机制</h2><span>AGENT INSTINCT</span></div>
+            <p id="abilityDescription"></p><div class="ability-track"><span id="abilityProgress"></span></div><small id="abilityStatus"></small>
+          </section>
+          <section class="relationship-panel">
+            <div class="panel-heading"><h2>猫际关系</h2><span>信任 / 警惕</span></div><div id="relationshipList"></div>
+          </section>
+          <section class="intel-file">
+            <div class="panel-heading"><h2>情报袋</h2><span id="intelCount">0 条</span></div>
+            <ul id="intelList"><li>调查获得情报；点击情报锁定爆料目标。</li></ul>
+          </section>
+        </aside>
+      </main>
+    </div>
+
+    <dialog class="scene-dialog" id="sceneDialog">
+      <div class="scene-visual" id="sceneVisual"></div>
+      <div class="scene-copy">
+        <p class="eyebrow" id="sceneKicker">现场结算</p><h2 id="sceneTitle"></h2><p class="scene-story" id="sceneStory"></p>
+        <div class="agent-stage-label"><i></i><span id="sceneAgentStatus">Agent 即兴发言</span></div>
+        <div class="quote-card agent-dialogues" id="sceneQuote"></div><div class="effect-list" id="effectList"></div>
+        <button class="primary-button" id="continueButton" type="button">继续下一回合</button>
+      </div>
+    </dialog>
+
+    <dialog class="ending-dialog" id="endingDialog">
+      <div class="ending-burst" aria-hidden="true">✦　✦　✦</div><p class="eyebrow">ELECTION COMPLETE</p>
+      <div class="ending-photo" id="endingPhoto"></div><h2 id="endingTitle"></h2><p id="endingStory"></p>
+      <div class="ending-summary" id="endingSummary"></div>
+      <div class="ending-actions"><button class="primary-button" id="playAgain" type="button">换只猫，再斗一局</button><button class="ghost-button" id="closeEnding" type="button">留在最终现场</button></div>
+    </dialog>
+
+    <footer>
+      <span>猫猫市政厅 · 所有承诺仅代表猫咪本人</span>
+      <details class="photo-credits"><summary>猫咪照片来源</summary><div>
+        金宝由主人提供 ·
+        <a href="https://commons.wikimedia.org/wiki/File:Orange_tabby_cat_closeup.jpg" target="_blank" rel="noreferrer">橘猫 CC0</a> ·
+        <a href="https://commons.wikimedia.org/wiki/File:Closeup_of_a_black_cat.jpg" target="_blank" rel="noreferrer">黑猫 CC0</a> ·
+        <a href="https://commons.wikimedia.org/wiki/File:Calico_cat_face.webp" target="_blank" rel="noreferrer">三花 / Nahleghini CC BY 4.0</a> ·
+        <a href="https://www.pexels.com/photo/brown-tabby-cat-in-close-up-photography-12484712/" target="_blank" rel="noreferrer">狸花 / Антон Злобин / Pexels</a>。头像均经过裁切。
+      </div></details>
+    </footer>
+    <script src="./game.js"></script>
+  </body>
+</html>
